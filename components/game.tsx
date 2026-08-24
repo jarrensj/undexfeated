@@ -1,0 +1,76 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { type Decision, TEAM_SIZE, wrapDex } from "@/lib/dex";
+
+const DECISIONS: Decision[] = [-10, 0, 10];
+
+function decisionLabel(decision: Decision): string {
+  if (decision === 0) return "keep";
+  return decision > 0 ? `+${decision}` : `−${-decision}`;
+}
+
+export default function Game({ deal }: { deal: number[] }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [decisions, setDecisions] = useState<Decision[]>([]);
+
+  const round = decisions.length;
+  const done = round === TEAM_SIZE;
+
+  const choose = (decision: Decision) => {
+    if (!done) setDecisions((prev) => [...prev, decision]);
+  };
+
+  // A fresh deal remounts this component (keyed by deal), resetting decisions.
+  const restart = () => startTransition(() => router.refresh());
+
+  if (done) {
+    return (
+      <div className="flex flex-col items-center gap-6">
+        <h2 className="text-lg font-medium">your team</h2>
+        <ol className="flex flex-col gap-2 tabular-nums">
+          {deal.map((n, i) => (
+            <li key={i} className="flex items-center gap-3">
+              <span className="w-16 text-right text-zinc-500">#{n}</span>
+              <span className="w-12 text-center text-zinc-500">
+                {decisionLabel(decisions[i])}
+              </span>
+              <span className="w-16 font-semibold">
+                #{wrapDex(n, decisions[i])}
+              </span>
+            </li>
+          ))}
+        </ol>
+        <button
+          onClick={restart}
+          disabled={pending}
+          className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+        >
+          new draft
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <p className="text-sm text-zinc-500">
+        round {round + 1} of {TEAM_SIZE}
+      </p>
+      <p className="text-6xl font-semibold tabular-nums">#{deal[round]}</p>
+      <div className="flex gap-3">
+        {DECISIONS.map((decision) => (
+          <button
+            key={decision}
+            onClick={() => choose(decision)}
+            className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+          >
+            {decisionLabel(decision)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
