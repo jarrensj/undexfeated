@@ -19,7 +19,13 @@ function statTotal(info: PokemonInfo): number {
   );
 }
 
-export default function Game({ deal }: { deal: number[] }) {
+export default function Game({
+  deal,
+  restartable = true,
+}: {
+  deal: number[];
+  restartable?: boolean;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [started, setStarted] = useState(false);
@@ -120,13 +126,17 @@ export default function Game({ deal }: { deal: number[] }) {
             </p>
           </div>
         )}
-        <button
-          onClick={restart}
-          disabled={pending}
-          className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
-        >
-          new draft
-        </button>
+        {restartable ? (
+          <button
+            onClick={restart}
+            disabled={pending}
+            className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+          >
+            new draft
+          </button>
+        ) : (
+          <p className="text-xs text-zinc-500">new daily at midnight utc</p>
+        )}
       </div>
     );
   }

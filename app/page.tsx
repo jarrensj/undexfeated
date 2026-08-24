@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { connection } from "next/server";
 import Game from "@/components/game";
 import { randomDeal } from "@/lib/dex";
@@ -9,6 +10,9 @@ export default async function Home() {
     <main className="flex flex-1 flex-col items-center justify-center gap-10">
       <h1>undexfeated</h1>
       <Game key={deal.join("-")} deal={deal} />
+      <Link href="/daily" className="text-xs text-zinc-500 underline">
+        play today&apos;s daily
+      </Link>
     </main>
   );
 }
