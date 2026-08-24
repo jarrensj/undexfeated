@@ -165,7 +165,7 @@ export default function Game({
             new draft
           </button>
         ) : (
-          <p className="text-xs text-zinc-500">new daily at midnight utc</p>
+          <p className="text-xs text-zinc-500">new daily at midnight pst</p>
         )}
       </div>
     );

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import Game from "@/components/game";
-import { dailyDeal, todayUtc } from "@/lib/daily";
+import { dailyDeal, todayPacific } from "@/lib/daily";
 
 export default async function Home() {
   await connection();
-  const date = todayUtc();
+  const date = todayPacific();
   const deal = dailyDeal(date);
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-10">
