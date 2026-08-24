@@ -103,7 +103,6 @@ export default function Game({
         "undexfeated",
         `daily · ${dailyDate}`,
         `team stat total ${teamTotal}`,
-        window.location.origin,
       ].join("\n");
       if (navigator.share && isMobileDevice()) {
         try {
