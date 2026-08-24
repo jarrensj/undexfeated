@@ -1,17 +1,21 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import Game from "@/components/game";
-import { randomDeal } from "@/lib/dex";
+import { dailyDeal, todayUtc } from "@/lib/daily";
 
 export default async function Home() {
   await connection();
-  const deal = randomDeal();
+  const date = todayUtc();
+  const deal = dailyDeal(date);
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-10">
-      <h1>undexfeated</h1>
-      <Game key={deal.join("-")} deal={deal} />
-      <Link href="/daily" className="text-xs text-zinc-500 underline">
-        play today&apos;s daily
+      <div className="flex flex-col items-center gap-1">
+        <h1>undexfeated</h1>
+        <p className="text-sm text-zinc-500 tabular-nums">daily · {date}</p>
+      </div>
+      <Game key={date} deal={deal} restartable={false} dailyDate={date} />
+      <Link href="/practice" className="text-xs text-zinc-500 underline">
+        practice mode
       </Link>
     </main>
   );
