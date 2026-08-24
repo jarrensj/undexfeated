@@ -172,13 +172,21 @@ export default function Game({
           </div>
         )}
         {restartable ? (
-          <button
-            onClick={restart}
-            disabled={pending}
-            className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
-          >
-            new draft
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={playAgain}
+              className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            >
+              play again
+            </button>
+            <button
+              onClick={restart}
+              disabled={pending}
+              className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            >
+              new draft
+            </button>
+          </div>
         ) : (
           <p className="text-xs text-zinc-500">new daily at midnight pst</p>
         )}
