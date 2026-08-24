@@ -18,13 +18,18 @@ function circularDistance(a: number, b: number): number {
   return Math.min(d, MAX_DEX - d);
 }
 
-export function randomDeal(count = TEAM_SIZE): number[] {
+// rng returns floats in [0, 1), like Math.random.
+export function dealNumbers(rng: () => number, count = TEAM_SIZE): number[] {
   const deal: number[] = [];
   while (deal.length < count) {
-    const candidate = Math.floor(Math.random() * MAX_DEX) + 1;
+    const candidate = Math.floor(rng() * MAX_DEX) + 1;
     if (deal.every((n) => circularDistance(n, candidate) > MIN_GAP)) {
       deal.push(candidate);
     }
   }
   return deal;
+}
+
+export function randomDeal(count = TEAM_SIZE): number[] {
+  return dealNumbers(Math.random, count);
 }
