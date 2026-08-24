@@ -57,6 +57,13 @@ export default function Game({
   // A fresh deal remounts this component (keyed by deal), resetting decisions.
   const restart = () => startTransition(() => router.refresh());
 
+  // Replay the same deal from round one (the daily's deal never changes).
+  const playAgain = () => {
+    setDecisions([]);
+    setTeam(null);
+    setCopied(false);
+  };
+
   if (!started) {
     return (
       <div className="flex flex-col items-center gap-6">
@@ -149,12 +156,20 @@ export default function Game({
           </div>
         )}
         {dailyDate && team && (
-          <button
-            onClick={shareDaily}
-            className="rounded-full bg-foreground px-5 py-2 text-sm text-background hover:opacity-80"
-          >
-            {copied ? "copied!" : "share"}
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={shareDaily}
+              className="rounded-full bg-foreground px-5 py-2 text-sm text-background hover:opacity-80"
+            >
+              {copied ? "copied!" : "share"}
+            </button>
+            <button
+              onClick={playAgain}
+              className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            >
+              play again
+            </button>
+          </div>
         )}
         {restartable ? (
           <button
