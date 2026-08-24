@@ -66,6 +66,10 @@ export default function Game({ deal }: { deal: number[] }) {
   }
 
   if (done) {
+    const members = (team ?? []).filter((m): m is PokemonInfo => m !== null);
+    const sumStat = (
+      key: "hp" | "attack" | "defense" | "sp_atk" | "sp_def" | "speed",
+    ) => members.reduce((sum, m) => sum + m[key], 0);
     return (
       <div className="flex flex-col items-center gap-6">
         <h2 className="text-lg font-medium">your team</h2>
@@ -101,12 +105,20 @@ export default function Game({ deal }: { deal: number[] }) {
           })}
         </ol>
         {team && (
-          <p className="text-sm tabular-nums">
-            team stat total{" "}
-            <span className="font-semibold">
-              {team.reduce((sum, m) => sum + (m ? statTotal(m) : 0), 0)}
-            </span>
-          </p>
+          <div className="flex flex-col items-center gap-1 tabular-nums">
+            <p className="text-xs text-zinc-500">team totals</p>
+            <p className="text-sm">
+              hp {sumStat("hp")} · atk {sumStat("attack")} · def{" "}
+              {sumStat("defense")} · spa {sumStat("sp_atk")} · spd{" "}
+              {sumStat("sp_def")} · spe {sumStat("speed")}
+            </p>
+            <p className="text-sm">
+              team stat total{" "}
+              <span className="font-semibold">
+                {members.reduce((sum, m) => sum + statTotal(m), 0)}
+              </span>
+            </p>
+          </div>
         )}
         <button
           onClick={restart}
