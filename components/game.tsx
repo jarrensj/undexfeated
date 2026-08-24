@@ -22,15 +22,18 @@ function statTotal(info: PokemonInfo): number {
 export default function Game({
   deal,
   restartable = true,
+  dailyDate,
 }: {
   deal: number[];
   restartable?: boolean;
+  dailyDate?: string;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [started, setStarted] = useState(false);
   const [decisions, setDecisions] = useState<Decision[]>([]);
   const [team, setTeam] = useState<(PokemonInfo | null)[] | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const round = decisions.length;
   const done = round === TEAM_SIZE;
@@ -76,6 +79,28 @@ export default function Game({
     const sumStat = (
       key: "hp" | "attack" | "defense" | "sp_atk" | "sp_def" | "speed",
     ) => members.reduce((sum, m) => sum + m[key], 0);
+    const teamTotal = members.reduce((sum, m) => sum + statTotal(m), 0);
+
+    const shareDaily = async () => {
+      const text = [
+        "undexfeated",
+        `daily · ${dailyDate}`,
+        `team stat total ${teamTotal}`,
+        window.location.origin,
+      ].join("\n");
+      if (navigator.share) {
+        try {
+          await navigator.share({ text });
+        } catch {
+          // user closed the share sheet
+        }
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    };
+
     return (
       <div className="flex flex-col items-center gap-6">
         <h2 className="text-lg font-medium">your team</h2>
@@ -119,12 +144,17 @@ export default function Game({
               {sumStat("sp_def")} · spe {sumStat("speed")}
             </p>
             <p className="text-sm">
-              team stat total{" "}
-              <span className="font-semibold">
-                {members.reduce((sum, m) => sum + statTotal(m), 0)}
-              </span>
+              team stat total <span className="font-semibold">{teamTotal}</span>
             </p>
           </div>
+        )}
+        {dailyDate && team && (
+          <button
+            onClick={shareDaily}
+            className="rounded-full bg-foreground px-5 py-2 text-sm text-background hover:opacity-80"
+          >
+            {copied ? "copied!" : "share"}
+          </button>
         )}
         {restartable ? (
           <button

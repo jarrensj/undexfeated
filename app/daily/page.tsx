@@ -13,7 +13,7 @@ export default async function DailyPage() {
         <h1>undexfeated</h1>
         <p className="text-sm text-zinc-500 tabular-nums">daily · {date}</p>
       </div>
-      <Game key={date} deal={deal} restartable={false} />
+      <Game key={date} deal={deal} restartable={false} dailyDate={date} />
       <Link href="/" className="text-xs text-zinc-500 underline">
         practice mode
       </Link>
