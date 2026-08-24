@@ -1,9 +1,9 @@
 "use server";
 
-import { getNames } from "@/lib/db";
+import { getTeam, type PokemonInfo } from "@/lib/db";
 import { MAX_DEX, TEAM_SIZE } from "@/lib/dex";
 
-export async function revealTeam(finalNumbers: number[]): Promise<string[]> {
+export async function revealTeam(finalNumbers: number[]): Promise<(PokemonInfo | null)[]> {
   if (
     !Array.isArray(finalNumbers) ||
     finalNumbers.length !== TEAM_SIZE ||
@@ -11,6 +11,6 @@ export async function revealTeam(finalNumbers: number[]): Promise<string[]> {
   ) {
     throw new Error("invalid team");
   }
-  const names = await getNames(finalNumbers);
-  return finalNumbers.map((n) => names.get(n) ?? `#${n}`);
+  const team = await getTeam(finalNumbers);
+  return finalNumbers.map((n) => team.get(n) ?? null);
 }
