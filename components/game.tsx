@@ -19,12 +19,18 @@ function statTotal(info: PokemonInfo): number {
   );
 }
 
+function decisionEmoji(decision: Decision): string {
+  if (decision === 0) return "🟰";
+  return decision > 0 ? "⬆️" : "⬇️";
+}
+
 export default function Game({ deal }: { deal: number[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [started, setStarted] = useState(false);
   const [decisions, setDecisions] = useState<Decision[]>([]);
   const [team, setTeam] = useState<(PokemonInfo | null)[] | null>(null);
+  const [copied, setCopied] = useState<"plain" | "names" | null>(null);
 
   const round = decisions.length;
   const done = round === TEAM_SIZE;
@@ -70,6 +76,33 @@ export default function Game({ deal }: { deal: number[] }) {
     const sumStat = (
       key: "hp" | "attack" | "defense" | "sp_atk" | "sp_def" | "speed",
     ) => members.reduce((sum, m) => sum + m[key], 0);
+    const teamTotal = members.reduce((sum, m) => sum + statTotal(m), 0);
+    const emojiRow = decisions.map(decisionEmoji).join("");
+
+    const share = async (variant: "plain" | "names") => {
+      const lines = ["undexfeated"];
+      if (variant === "names") {
+        decisions.forEach((d, i) =>
+          lines.push(`${decisionEmoji(d)} ${team?.[i]?.name ?? "?"}`),
+        );
+      } else {
+        lines.push(emojiRow);
+      }
+      lines.push(`team stat total ${teamTotal}`, window.location.origin);
+      const text = lines.join("\n");
+      if (navigator.share) {
+        try {
+          await navigator.share({ text });
+        } catch {
+          // user closed the share sheet
+        }
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      setCopied(variant);
+      setTimeout(() => setCopied(null), 2000);
+    };
+
     return (
       <div className="flex flex-col items-center gap-6">
         <h2 className="text-lg font-medium">your team</h2>
@@ -113,11 +146,31 @@ export default function Game({ deal }: { deal: number[] }) {
               {sumStat("sp_def")} · spe {sumStat("speed")}
             </p>
             <p className="text-sm">
-              team stat total{" "}
-              <span className="font-semibold">
-                {members.reduce((sum, m) => sum + statTotal(m), 0)}
-              </span>
+              team stat total <span className="font-semibold">{teamTotal}</span>
             </p>
+          </div>
+        )}
+        {team && (
+          <div className="flex flex-col items-center gap-2 rounded-xl border border-zinc-300 px-8 py-4 dark:border-zinc-700">
+            <p className="text-sm text-zinc-500">undexfeated</p>
+            <p className="text-xl tracking-widest">{emojiRow}</p>
+            <p className="text-sm text-zinc-500 tabular-nums">
+              team stat total {teamTotal}
+            </p>
+            <div className="mt-1 flex gap-3">
+              <button
+                onClick={() => share("plain")}
+                className="rounded-full bg-foreground px-5 py-2 text-sm text-background hover:opacity-80"
+              >
+                {copied === "plain" ? "copied!" : "share results"}
+              </button>
+              <button
+                onClick={() => share("names")}
+                className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              >
+                {copied === "names" ? "copied!" : "share with team"}
+              </button>
+            </div>
           </div>
         )}
         <button
