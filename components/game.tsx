@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { revealTeam } from "@/app/actions";
 import { type Decision, TEAM_SIZE, wrapDex } from "@/lib/dex";
 
 const DECISIONS: Decision[] = [-10, 0, 10];
@@ -16,6 +17,7 @@ export default function Game({ deal }: { deal: number[] }) {
   const [pending, startTransition] = useTransition();
   const [started, setStarted] = useState(false);
   const [decisions, setDecisions] = useState<Decision[]>([]);
+  const [names, setNames] = useState<string[] | null>(null);
 
   const round = decisions.length;
   const done = round === TEAM_SIZE;
@@ -25,8 +27,14 @@ export default function Game({ deal }: { deal: number[] }) {
     decision !== 0 && decisions.includes(decision);
 
   const choose = (decision: Decision) => {
-    if (!done && !shiftUsed(decision)) {
-      setDecisions((prev) => [...prev, decision]);
+    if (done || shiftUsed(decision)) return;
+    const next = [...decisions, decision];
+    setDecisions(next);
+    if (next.length === TEAM_SIZE) {
+      const finals = deal.map((n, i) => wrapDex(n, next[i]));
+      revealTeam(finals)
+        .then(setNames)
+        .catch(() => setNames(finals.map(() => "?")));
     }
   };
 
@@ -63,6 +71,9 @@ export default function Game({ deal }: { deal: number[] }) {
               </span>
               <span className="w-16 font-semibold">
                 #{wrapDex(n, decisions[i])}
+              </span>
+              <span className="w-32 font-semibold">
+                {names ? names[i] : "…"}
               </span>
             </li>
           ))}
