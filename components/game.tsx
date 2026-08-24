@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { revealTeam } from "@/app/actions";
+import type { PokemonInfo } from "@/lib/db";
 import { type Decision, TEAM_SIZE, wrapDex } from "@/lib/dex";
 
 const DECISIONS: Decision[] = [-10, 0, 10];
@@ -17,7 +18,7 @@ export default function Game({ deal }: { deal: number[] }) {
   const [pending, startTransition] = useTransition();
   const [started, setStarted] = useState(false);
   const [decisions, setDecisions] = useState<Decision[]>([]);
-  const [names, setNames] = useState<string[] | null>(null);
+  const [team, setTeam] = useState<(PokemonInfo | null)[] | null>(null);
 
   const round = decisions.length;
   const done = round === TEAM_SIZE;
@@ -33,8 +34,8 @@ export default function Game({ deal }: { deal: number[] }) {
     if (next.length === TEAM_SIZE) {
       const finals = deal.map((n, i) => wrapDex(n, next[i]));
       revealTeam(finals)
-        .then(setNames)
-        .catch(() => setNames(finals.map(() => "?")));
+        .then(setTeam)
+        .catch(() => setTeam(finals.map(() => null)));
     }
   };
 
@@ -62,21 +63,32 @@ export default function Game({ deal }: { deal: number[] }) {
     return (
       <div className="flex flex-col items-center gap-6">
         <h2 className="text-lg font-medium">your team</h2>
-        <ol className="flex flex-col gap-2 tabular-nums">
-          {deal.map((n, i) => (
-            <li key={i} className="flex items-center gap-3">
-              <span className="w-16 text-right text-zinc-500">#{n}</span>
-              <span className="w-12 text-center text-zinc-500">
-                {decisionLabel(decisions[i])}
-              </span>
-              <span className="w-16 font-semibold">
-                #{wrapDex(n, decisions[i])}
-              </span>
-              <span className="w-32 font-semibold">
-                {names ? names[i] : "…"}
-              </span>
-            </li>
-          ))}
+        <ol className="flex flex-col gap-3 tabular-nums">
+          {deal.map((n, i) => {
+            const info = team?.[i];
+            return (
+              <li key={i} className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-3">
+                  <span className="w-16 text-right text-zinc-500">#{n}</span>
+                  <span className="w-12 text-center text-zinc-500">
+                    {decisionLabel(decisions[i])}
+                  </span>
+                  <span className="w-16 font-semibold">
+                    #{wrapDex(n, decisions[i])}
+                  </span>
+                  <span className="w-32 font-semibold">
+                    {team ? (info?.name ?? "?") : "…"}
+                  </span>
+                </div>
+                {info && (
+                  <p className="pl-[13.25rem] text-xs text-zinc-500">
+                    hp {info.hp} · atk {info.attack} · def {info.defense} · spa{" "}
+                    {info.sp_atk} · spd {info.sp_def} · spe {info.speed}
+                  </p>
+                )}
+              </li>
+            );
+          })}
         </ol>
         <button
           onClick={restart}

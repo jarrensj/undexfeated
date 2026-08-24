@@ -1,14 +1,27 @@
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
+export type PokemonInfo = {
+  dex_number: number;
+  name: string;
+  hp: number;
+  attack: number;
+  defense: number;
+  sp_atk: number;
+  sp_def: number;
+  speed: number;
+};
+
+type StatsRow = Omit<PokemonInfo, "name"> & { pokemon_numbers: { name: string } };
+
 // Server-side only — the anon key has read-only RLS access, but the client
-// should never talk to the database directly (names stay hidden until reveal).
-export async function getNames(dexNumbers: number[]): Promise<Map<number, string>> {
+// should never talk to the database directly (teams stay hidden until reveal).
+export async function getTeam(dexNumbers: number[]): Promise<Map<number, PokemonInfo>> {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     throw new Error("Missing SUPABASE_URL / SUPABASE_ANON_KEY");
   }
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/pokemon_numbers?dex_number=in.(${dexNumbers.join(",")})&select=dex_number,name`,
+    `${SUPABASE_URL}/rest/v1/pokemon_stats?dex_number=in.(${dexNumbers.join(",")})&select=dex_number,hp,attack,defense,sp_atk,sp_def,speed,pokemon_numbers(name)`,
     {
       headers: {
         apikey: SUPABASE_ANON_KEY,
@@ -18,7 +31,12 @@ export async function getNames(dexNumbers: number[]): Promise<Map<number, string
       cache: "force-cache",
     },
   );
-  if (!res.ok) throw new Error(`name lookup failed: ${res.status}`);
-  const rows: { dex_number: number; name: string }[] = await res.json();
-  return new Map(rows.map((row) => [row.dex_number, row.name]));
+  if (!res.ok) throw new Error(`team lookup failed: ${res.status}`);
+  const rows: StatsRow[] = await res.json();
+  return new Map(
+    rows.map(({ pokemon_numbers, ...stats }) => [
+      stats.dex_number,
+      { ...stats, name: pokemon_numbers.name },
+    ]),
+  );
 }
