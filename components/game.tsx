@@ -30,7 +30,7 @@ export default function Game({ deal }: { deal: number[] }) {
   const [started, setStarted] = useState(false);
   const [decisions, setDecisions] = useState<Decision[]>([]);
   const [team, setTeam] = useState<(PokemonInfo | null)[] | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"plain" | "names" | null>(null);
 
   const round = decisions.length;
   const done = round === TEAM_SIZE;
@@ -79,13 +79,17 @@ export default function Game({ deal }: { deal: number[] }) {
     const teamTotal = members.reduce((sum, m) => sum + statTotal(m), 0);
     const emojiRow = decisions.map(decisionEmoji).join("");
 
-    const share = async () => {
-      const text = [
-        "undexfeated",
-        emojiRow,
-        `team stat total ${teamTotal}`,
-        window.location.origin,
-      ].join("\n");
+    const share = async (variant: "plain" | "names") => {
+      const lines = ["undexfeated"];
+      if (variant === "names") {
+        decisions.forEach((d, i) =>
+          lines.push(`${decisionEmoji(d)} ${team?.[i]?.name ?? "?"}`),
+        );
+      } else {
+        lines.push(emojiRow);
+      }
+      lines.push(`team stat total ${teamTotal}`, window.location.origin);
+      const text = lines.join("\n");
       if (navigator.share) {
         try {
           await navigator.share({ text });
@@ -95,8 +99,8 @@ export default function Game({ deal }: { deal: number[] }) {
         return;
       }
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopied(variant);
+      setTimeout(() => setCopied(null), 2000);
     };
 
     return (
@@ -153,12 +157,20 @@ export default function Game({ deal }: { deal: number[] }) {
             <p className="text-sm text-zinc-500 tabular-nums">
               team stat total {teamTotal}
             </p>
-            <button
-              onClick={share}
-              className="mt-1 rounded-full bg-foreground px-5 py-2 text-sm text-background hover:opacity-80"
-            >
-              {copied ? "copied!" : "share results"}
-            </button>
+            <div className="mt-1 flex gap-3">
+              <button
+                onClick={() => share("plain")}
+                className="rounded-full bg-foreground px-5 py-2 text-sm text-background hover:opacity-80"
+              >
+                {copied === "plain" ? "copied!" : "share results"}
+              </button>
+              <button
+                onClick={() => share("names")}
+                className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              >
+                {copied === "names" ? "copied!" : "share with team"}
+              </button>
+            </div>
           </div>
         )}
         <button
