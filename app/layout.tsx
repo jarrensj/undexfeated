@@ -33,8 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           and materials that may appear on this site — including but not
           limited to names, Pokédex numbers, images, and any other related
           intellectual property — are trademarks and copyrights of their
-          respective owners, © Nintendo, Creatures Inc., GAME FREAK inc. Names
-          and numbers are used solely to identify the characters referred to.
+          respective owners, © Nintendo, Creatures Inc., GAME FREAK inc.
           This project claims no ownership of any such material and intends no
           infringement. Team ratings are fan-made opinions for entertainment
           purposes only. Any material will be removed promptly at a rights
