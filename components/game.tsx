@@ -30,7 +30,8 @@ export default function Game({ deal }: { deal: number[] }) {
   const [started, setStarted] = useState(false);
   const [decisions, setDecisions] = useState<Decision[]>([]);
   const [team, setTeam] = useState<(PokemonInfo | null)[] | null>(null);
-  const [copied, setCopied] = useState<"plain" | "names" | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [includeNames, setIncludeNames] = useState(false);
 
   const round = decisions.length;
   const done = round === TEAM_SIZE;
@@ -79,9 +80,9 @@ export default function Game({ deal }: { deal: number[] }) {
     const teamTotal = members.reduce((sum, m) => sum + statTotal(m), 0);
     const emojiRow = decisions.map(decisionEmoji).join("");
 
-    const share = async (variant: "plain" | "names") => {
+    const share = async () => {
       const lines = ["undexfeated"];
-      if (variant === "names") {
+      if (includeNames) {
         decisions.forEach((d, i) =>
           lines.push(`${decisionEmoji(d)} ${team?.[i]?.name ?? "?"}`),
         );
@@ -99,8 +100,8 @@ export default function Game({ deal }: { deal: number[] }) {
         return;
       }
       await navigator.clipboard.writeText(text);
-      setCopied(variant);
-      setTimeout(() => setCopied(null), 2000);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     };
 
     return (
@@ -157,20 +158,20 @@ export default function Game({ deal }: { deal: number[] }) {
             <p className="text-sm text-zinc-500 tabular-nums">
               team stat total {teamTotal}
             </p>
-            <div className="mt-1 flex gap-3">
-              <button
-                onClick={() => share("plain")}
-                className="rounded-full bg-foreground px-5 py-2 text-sm text-background hover:opacity-80"
-              >
-                {copied === "plain" ? "copied!" : "share results"}
-              </button>
-              <button
-                onClick={() => share("names")}
-                className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
-              >
-                {copied === "names" ? "copied!" : "share with team"}
-              </button>
-            </div>
+            <label className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
+              <input
+                type="checkbox"
+                checked={includeNames}
+                onChange={(e) => setIncludeNames(e.target.checked)}
+              />
+              spoiler: include names
+            </label>
+            <button
+              onClick={share}
+              className="rounded-full bg-foreground px-5 py-2 text-sm text-background hover:opacity-80"
+            >
+              {copied ? "copied!" : "share results"}
+            </button>
           </div>
         )}
         <button
