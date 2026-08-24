@@ -5,6 +5,11 @@ import { useState, useTransition } from "react";
 import { revealTeam } from "@/app/actions";
 import type { PokemonInfo } from "@/lib/db";
 import { type Decision, TEAM_SIZE, wrapDex } from "@/lib/dex";
+import {
+  teamCoverage,
+  teamWeaknesses,
+  type TypeName,
+} from "@/lib/type-chart";
 
 const DECISIONS: Decision[] = [-10, 0, 10];
 
@@ -60,6 +65,12 @@ export default function Game({ deal }: { deal: number[] }) {
   }
 
   if (done) {
+    const revealed = (team ?? []).filter((m): m is PokemonInfo => m !== null);
+    const memberTypes = revealed.map(
+      (m) => [m.type1, ...(m.type2 ? [m.type2] : [])] as TypeName[],
+    );
+    const coverage = teamCoverage(memberTypes);
+    const weaknesses = teamWeaknesses(memberTypes);
     return (
       <div className="flex flex-col items-center gap-6">
         <h2 className="text-lg font-medium">your team</h2>
@@ -93,6 +104,22 @@ export default function Game({ deal }: { deal: number[] }) {
             );
           })}
         </ol>
+        {revealed.length > 0 && (
+          <div className="flex max-w-sm flex-col gap-1 text-center">
+            <p className="text-xs text-zinc-500">hits super effective</p>
+            <p className="text-sm">
+              {coverage.length > 0 ? coverage.join(" · ") : "nothing"}
+            </p>
+            <p className="mt-2 text-xs text-zinc-500">weak to</p>
+            <p className="text-sm">
+              {weaknesses.length > 0
+                ? weaknesses
+                    .map((w) => (w.count > 1 ? `${w.type} ×${w.count}` : w.type))
+                    .join(" · ")
+                : "nothing"}
+            </p>
+          </div>
+        )}
         <button
           onClick={restart}
           disabled={pending}
