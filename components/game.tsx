@@ -13,6 +13,12 @@ function decisionLabel(decision: Decision): string {
   return decision > 0 ? `+${decision}` : `−${-decision}`;
 }
 
+function statTotal(info: PokemonInfo): number {
+  return (
+    info.hp + info.attack + info.defense + info.sp_atk + info.sp_def + info.speed
+  );
+}
+
 export default function Game({ deal }: { deal: number[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -60,6 +66,10 @@ export default function Game({ deal }: { deal: number[] }) {
   }
 
   if (done) {
+    const members = (team ?? []).filter((m): m is PokemonInfo => m !== null);
+    const sumStat = (
+      key: "hp" | "attack" | "defense" | "sp_atk" | "sp_def" | "speed",
+    ) => members.reduce((sum, m) => sum + m[key], 0);
     return (
       <div className="flex flex-col items-center gap-6">
         <h2 className="text-lg font-medium">your team</h2>
@@ -86,13 +96,30 @@ export default function Game({ deal }: { deal: number[] }) {
                 {info && (
                   <p className="pl-[13.25rem] text-xs text-zinc-500">
                     hp {info.hp} · atk {info.attack} · def {info.defense} · spa{" "}
-                    {info.sp_atk} · spd {info.sp_def} · spe {info.speed}
+                    {info.sp_atk} · spd {info.sp_def} · spe {info.speed} · total{" "}
+                    {statTotal(info)}
                   </p>
                 )}
               </li>
             );
           })}
         </ol>
+        {team && (
+          <div className="flex flex-col items-center gap-1 tabular-nums">
+            <p className="text-xs text-zinc-500">team totals</p>
+            <p className="text-sm">
+              hp {sumStat("hp")} · atk {sumStat("attack")} · def{" "}
+              {sumStat("defense")} · spa {sumStat("sp_atk")} · spd{" "}
+              {sumStat("sp_def")} · spe {sumStat("speed")}
+            </p>
+            <p className="text-sm">
+              team stat total{" "}
+              <span className="font-semibold">
+                {members.reduce((sum, m) => sum + statTotal(m), 0)}
+              </span>
+            </p>
+          </div>
+        )}
         <button
           onClick={restart}
           disabled={pending}
