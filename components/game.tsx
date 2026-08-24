@@ -79,6 +79,9 @@ export default function Game({ deal }: { deal: number[] }) {
                   <span className="w-32 font-semibold">
                     {team ? (info?.name ?? "?") : "…"}
                   </span>
+                  <span className="w-28 text-sm text-zinc-500">
+                    {info && (info.type2 ? `${info.type1} · ${info.type2}` : info.type1)}
+                  </span>
                 </div>
                 {info && (
                   <p className="pl-[13.25rem] text-xs text-zinc-500">
