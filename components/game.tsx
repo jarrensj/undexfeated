@@ -19,6 +19,16 @@ function statTotal(info: PokemonInfo): number {
   );
 }
 
+// The native share sheet is only worth invoking on phones/tablets — desktop
+// browsers also expose navigator.share, but there a plain copy is nicer.
+function isMobileDevice(): boolean {
+  return (
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    // iPadOS reports itself as a Mac but is the only "Mac" with multitouch.
+    (navigator.userAgent.includes("Mac") && navigator.maxTouchPoints > 1)
+  );
+}
+
 export default function Game({
   deal,
   restartable = true,
@@ -88,7 +98,7 @@ export default function Game({
         `team stat total ${teamTotal}`,
         window.location.origin,
       ].join("\n");
-      if (navigator.share) {
+      if (navigator.share && isMobileDevice()) {
         try {
           await navigator.share({ text });
         } catch {
