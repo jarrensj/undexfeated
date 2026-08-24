@@ -1,13 +1,16 @@
 import { dealNumbers } from "./dex";
 
-// UTC date string like "2026-08-24" — the seed for the day's deal.
-// The daily resets at UTC midnight.
-export function todayUtc(): string {
-  return new Date().toISOString().slice(0, 10);
+// Pacific-time date string like "2026-08-24" — the seed for the day's deal.
+// The daily resets at midnight Pacific (America/Los_Angeles, DST-aware).
+// en-CA locale formats as YYYY-MM-DD.
+export function todayPacific(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Los_Angeles",
+  }).format(new Date());
 }
 
 // xmur3 string hash seeding a mulberry32 PRNG — deterministic per date,
-// so every player gets the same deal on the same (UTC) day.
+// so every player gets the same deal on the same (Pacific) day.
 function seededRng(seed: string): () => number {
   let h = 1779033703 ^ seed.length;
   for (let i = 0; i < seed.length; i++) {
@@ -23,6 +26,6 @@ function seededRng(seed: string): () => number {
   };
 }
 
-export function dailyDeal(date: string = todayUtc()): number[] {
+export function dailyDeal(date: string = todayPacific()): number[] {
   return dealNumbers(seededRng(date));
 }
