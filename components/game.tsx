@@ -13,6 +13,12 @@ function decisionLabel(decision: Decision): string {
   return decision > 0 ? `+${decision}` : `−${-decision}`;
 }
 
+function statTotal(info: PokemonInfo): number {
+  return (
+    info.hp + info.attack + info.defense + info.sp_atk + info.sp_def + info.speed
+  );
+}
+
 export default function Game({ deal }: { deal: number[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -86,13 +92,22 @@ export default function Game({ deal }: { deal: number[] }) {
                 {info && (
                   <p className="pl-[13.25rem] text-xs text-zinc-500">
                     hp {info.hp} · atk {info.attack} · def {info.defense} · spa{" "}
-                    {info.sp_atk} · spd {info.sp_def} · spe {info.speed}
+                    {info.sp_atk} · spd {info.sp_def} · spe {info.speed} · total{" "}
+                    {statTotal(info)}
                   </p>
                 )}
               </li>
             );
           })}
         </ol>
+        {team && (
+          <p className="text-sm tabular-nums">
+            team stat total{" "}
+            <span className="font-semibold">
+              {team.reduce((sum, m) => sum + (m ? statTotal(m) : 0), 0)}
+            </span>
+          </p>
+        )}
         <button
           onClick={restart}
           disabled={pending}
