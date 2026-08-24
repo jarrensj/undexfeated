@@ -15,7 +15,7 @@ export default async function DailyPage() {
       </div>
       <Game key={date} deal={deal} restartable={false} />
       <Link href="/" className="text-xs text-zinc-500 underline">
-        free play
+        practice mode
       </Link>
     </main>
   );
