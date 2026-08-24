@@ -14,6 +14,7 @@ function decisionLabel(decision: Decision): string {
 export default function Game({ deal }: { deal: number[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [started, setStarted] = useState(false);
   const [decisions, setDecisions] = useState<Decision[]>([]);
 
   const round = decisions.length;
@@ -31,6 +32,23 @@ export default function Game({ deal }: { deal: number[] }) {
 
   // A fresh deal remounts this component (keyed by deal), resetting decisions.
   const restart = () => startTransition(() => router.refresh());
+
+  if (!started) {
+    return (
+      <div className="flex flex-col items-center gap-6">
+        <p className="max-w-xs text-center text-sm text-zinc-500">
+          draft a team of six by dex number alone — keep what you&apos;re dealt
+          or shift it ±10. you only meet your team at the end.
+        </p>
+        <button
+          onClick={() => setStarted(true)}
+          className="rounded-full bg-foreground px-6 py-2 text-sm text-background hover:opacity-80"
+        >
+          start
+        </button>
+      </div>
+    );
+  }
 
   if (done) {
     return (
