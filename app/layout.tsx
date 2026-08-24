@@ -27,12 +27,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         {children}
         <footer className="p-4 text-center text-xs text-zinc-500">
-          undexfeated is a fan-made project not affiliated with, endorsed,
-          sponsored, or approved by Nintendo, Creatures Inc., GAME FREAK inc.,
-          or The Pokémon Company. Pokémon names and Pokédex numbers are
-          trademarks of their respective owners, used for identification
-          purposes only. Team ratings are fan-made opinions for entertainment
-          purposes.
+          undexfeated is a free, unofficial, fan-made project. It is not
+          affiliated with, endorsed, or sponsored by Nintendo, Creatures Inc.,
+          GAME FREAK inc., or The Pokémon Company. All Pokémon-related content
+          and materials that may appear on this site — including but not
+          limited to names, Pokédex numbers, images, and any other related
+          intellectual property — are trademarks and copyrights of their
+          respective owners, © Nintendo, Creatures Inc., GAME FREAK inc.
+          This project claims no ownership of any such material and intends no
+          infringement. Team ratings are fan-made opinions for entertainment
+          purposes only. Any material will be removed promptly at a rights
+          holder&apos;s request.
         </footer>
         <Analytics />
       </body>
