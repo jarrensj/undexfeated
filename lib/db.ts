@@ -4,6 +4,8 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 export type PokemonInfo = {
   dex_number: number;
   name: string;
+  type1: string;
+  type2: string | null;
   hp: number;
   attack: number;
   defense: number;
@@ -21,7 +23,7 @@ export async function getTeam(dexNumbers: number[]): Promise<Map<number, Pokemon
     throw new Error("Missing SUPABASE_URL / SUPABASE_ANON_KEY");
   }
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/pokemon_stats?dex_number=in.(${dexNumbers.join(",")})&select=dex_number,hp,attack,defense,sp_atk,sp_def,speed,pokemon_numbers(name)`,
+    `${SUPABASE_URL}/rest/v1/pokemon_stats?dex_number=in.(${dexNumbers.join(",")})&select=dex_number,type1,type2,hp,attack,defense,sp_atk,sp_def,speed,pokemon_numbers(name)`,
     {
       headers: {
         apikey: SUPABASE_ANON_KEY,
