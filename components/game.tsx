@@ -19,8 +19,14 @@ export default function Game({ deal }: { deal: number[] }) {
   const round = decisions.length;
   const done = round === TEAM_SIZE;
 
+  // −10 and +10 are each usable once per draft; keep is always available.
+  const shiftUsed = (decision: Decision) =>
+    decision !== 0 && decisions.includes(decision);
+
   const choose = (decision: Decision) => {
-    if (!done) setDecisions((prev) => [...prev, decision]);
+    if (!done && !shiftUsed(decision)) {
+      setDecisions((prev) => [...prev, decision]);
+    }
   };
 
   // A fresh deal remounts this component (keyed by deal), resetting decisions.
@@ -65,12 +71,16 @@ export default function Game({ deal }: { deal: number[] }) {
           <button
             key={decision}
             onClick={() => choose(decision)}
-            className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            disabled={shiftUsed(decision)}
+            className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent dark:border-zinc-700 dark:hover:bg-zinc-900 dark:disabled:hover:bg-transparent"
           >
             {decisionLabel(decision)}
           </button>
         ))}
       </div>
+      <p className="text-xs text-zinc-500">
+        −10 and +10 can each be used once per draft
+      </p>
     </div>
   );
 }
