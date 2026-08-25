@@ -295,7 +295,9 @@ export default function Game({
         {round > 0 && (
           <p className="text-[11px] text-faint tabular-nums">
             so far:{" "}
-            {decisions.map((d, i) => `#${wrapDex(deal[i], d)}`).join(" · ")}
+            <span className="text-accent">
+              {decisions.map((d, i) => `#${wrapDex(deal[i], d)}`).join(" · ")}
+            </span>
           </p>
         )}
       </div>
