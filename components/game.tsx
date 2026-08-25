@@ -49,6 +49,8 @@ export default function Game({
   // Brief pause after the sixth pick so the completed draft registers
   // before the results take over.
   const [showResults, setShowResults] = useState(false);
+  // Quick feedback after each decision; keyed so back-to-back picks re-animate.
+  const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
   const [copied, setCopied] = useState(false);
 
   const round = decisions.length;
@@ -60,6 +62,18 @@ export default function Game({
 
   const choose = (decision: Decision) => {
     if (done || shiftUsed(decision)) return;
+    const dealt = deal[round];
+    const landed = wrapDex(dealt, decision);
+    // The round number is unique per pick, so consecutive toasts re-key.
+    const id = round;
+    setToast({
+      id,
+      text:
+        decision === 0
+          ? `kept #${landed}`
+          : `#${dealt} ${decisionLabel(decision)} → #${landed}`,
+    });
+    setTimeout(() => setToast((t) => (t?.id === id ? null : t)), 1600);
     const next = [...decisions, decision];
     setDecisions(next);
     if (next.length === TEAM_SIZE) {
@@ -79,6 +93,7 @@ export default function Game({
     setDecisions([]);
     setTeam(null);
     setShowResults(false);
+    setToast(null);
     setCopied(false);
   };
 
@@ -254,6 +269,16 @@ export default function Game({
           <p className="text-[11px] text-faint tabular-nums">
             so far:{" "}
             {decisions.map((d, i) => `#${wrapDex(deal[i], d)}`).join(" · ")}
+          </p>
+        )}
+      </div>
+      <div aria-live="polite" className="flex h-9 items-center">
+        {toast && (
+          <p
+            key={toast.id}
+            className="rounded-md bg-accent px-4 py-1.5 text-sm font-bold tabular-nums text-background [animation:toast-in_0.2s_ease-out]"
+          >
+            {toast.text}
           </p>
         )}
       </div>
