@@ -43,6 +43,9 @@ export default function Game({
   const [started, setStarted] = useState(false);
   const [decisions, setDecisions] = useState<Decision[]>([]);
   const [team, setTeam] = useState<(PokemonInfo | null)[] | null>(null);
+  // Brief pause after the sixth pick so the completed draft registers
+  // before the results take over.
+  const [showResults, setShowResults] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const round = decisions.length;
@@ -61,6 +64,7 @@ export default function Game({
       revealTeam(finals)
         .then(setTeam)
         .catch(() => setTeam(finals.map(() => null)));
+      setTimeout(() => setShowResults(true), 1000);
     }
   };
 
@@ -71,6 +75,7 @@ export default function Game({
   const playAgain = () => {
     setDecisions([]);
     setTeam(null);
+    setShowResults(false);
     setCopied(false);
   };
 
@@ -91,7 +96,7 @@ export default function Game({
     );
   }
 
-  if (done) {
+  if (done && showResults) {
     const members = (team ?? []).filter((m): m is PokemonInfo => m !== null);
     const sumStat = (
       key: "hp" | "attack" | "defense" | "sp_atk" | "sp_def" | "speed",
@@ -207,7 +212,7 @@ export default function Game({
     <div className="flex flex-col items-center gap-6">
       <div className="flex flex-col items-center gap-1">
         <p className="text-sm text-zinc-500">
-          round {round + 1} of {TEAM_SIZE}
+          {done ? "draft complete" : `round ${round + 1} of ${TEAM_SIZE}`}
         </p>
         {round > 0 && (
           <p className="text-xs text-zinc-500 tabular-nums">
@@ -215,22 +220,30 @@ export default function Game({
           </p>
         )}
       </div>
-      <p className="text-6xl font-semibold tabular-nums">#{deal[round]}</p>
-      <div className="flex gap-3">
-        {DECISIONS.map((decision) => (
-          <button
-            key={decision}
-            onClick={() => choose(decision)}
-            disabled={shiftUsed(decision)}
-            className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent dark:border-zinc-700 dark:hover:bg-zinc-900 dark:disabled:hover:bg-transparent"
-          >
-            {decisionLabel(decision)}
-          </button>
-        ))}
-      </div>
-      <p className="text-xs text-zinc-500">
-        −10 and +10 can each be used once per draft
-      </p>
+      {done ? (
+        <p className="animate-pulse text-sm text-zinc-500">
+          revealing your team…
+        </p>
+      ) : (
+        <>
+          <p className="text-6xl font-semibold tabular-nums">#{deal[round]}</p>
+          <div className="flex gap-3">
+            {DECISIONS.map((decision) => (
+              <button
+                key={decision}
+                onClick={() => choose(decision)}
+                disabled={shiftUsed(decision)}
+                className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent dark:border-zinc-700 dark:hover:bg-zinc-900 dark:disabled:hover:bg-transparent"
+              >
+                {decisionLabel(decision)}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-zinc-500">
+            −10 and +10 can each be used once per draft
+          </p>
+        </>
+      )}
     </div>
   );
 }
