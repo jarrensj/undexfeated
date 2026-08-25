@@ -181,15 +181,13 @@ export default function Game({
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                  {info?.sprite_url ? (
+                  {info?.sprite_url && (
                     // eslint-disable-next-line @next/next/no-img-element -- image source is data-driven; next/image needs a static host allowlist
                     <img
                       src={info.sprite_url}
                       alt={info.name}
                       className="h-8 w-8 [image-rendering:pixelated]"
                     />
-                  ) : (
-                    <span className="h-8 w-8" />
                   )}
                   <span className="text-sm font-bold tabular-nums">
                     #{wrapDex(n, decisions[i])}
