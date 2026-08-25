@@ -97,11 +97,12 @@ export default function Game({
     setCopied(false);
   };
 
-  // Viewport-level toast — drops in from the top, never touches the layout.
+  // Overlay anchored just above the wordmark — outside the layout flow,
+  // so it never pushes content around.
   const toastEl = (
     <div
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 top-6 z-50 flex justify-center"
+      className="pointer-events-none absolute inset-x-0 bottom-full z-50 mb-[88px] flex justify-center"
     >
       {toast && (
         <p
@@ -158,7 +159,7 @@ export default function Game({
     };
 
     return (
-      <div className="flex w-full max-w-[600px] animate-fade-up flex-col items-center gap-8">
+      <div className="relative flex w-full max-w-[600px] animate-fade-up flex-col items-center gap-8">
         <div className="flex flex-col items-center gap-0.5">
           <p className="text-xs uppercase tracking-[0.12em] text-muted">
             team stat total
@@ -264,7 +265,7 @@ export default function Game({
   }
 
   return (
-    <div className="flex animate-fade-up flex-col items-center gap-8">
+    <div className="relative flex animate-fade-up flex-col items-center gap-8">
       <div className="flex flex-col items-center gap-2.5">
         <div className="flex items-center gap-2">
           {Array.from({ length: TEAM_SIZE }, (_, i) => (
