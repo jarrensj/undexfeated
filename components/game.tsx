@@ -97,6 +97,23 @@ export default function Game({
     setCopied(false);
   };
 
+  // Viewport-level toast — drops in from the top, never touches the layout.
+  const toastEl = (
+    <div
+      aria-live="polite"
+      className="pointer-events-none fixed inset-x-0 top-6 z-50 flex justify-center"
+    >
+      {toast && (
+        <p
+          key={toast.id}
+          className="rounded-md bg-accent px-4 py-1.5 text-sm font-bold whitespace-nowrap tabular-nums text-background [animation:toast-in_0.2s_ease-out]"
+        >
+          {toast.text}
+        </p>
+      )}
+    </div>
+  );
+
   if (!started) {
     return (
       <div className="flex animate-fade-up flex-col items-center gap-7">
@@ -241,13 +258,14 @@ export default function Game({
         ) : (
           <p className="text-xs text-faint">new daily at midnight pst</p>
         )}
+        {toastEl}
       </div>
     );
   }
 
   return (
     <div className="flex animate-fade-up flex-col items-center gap-8">
-      <div className="relative flex flex-col items-center gap-2.5">
+      <div className="flex flex-col items-center gap-2.5">
         <div className="flex items-center gap-2">
           {Array.from({ length: TEAM_SIZE }, (_, i) => (
             <span
@@ -271,20 +289,8 @@ export default function Game({
             {decisions.map((d, i) => `#${wrapDex(deal[i], d)}`).join(" · ")}
           </p>
         )}
-        <div
-          aria-live="polite"
-          className="pointer-events-none absolute inset-x-0 top-full z-10 mt-2 flex justify-center"
-        >
-          {toast && (
-            <p
-              key={toast.id}
-              className="rounded-md bg-accent px-4 py-1.5 text-sm font-bold whitespace-nowrap tabular-nums text-background [animation:toast-in_0.2s_ease-out]"
-            >
-              {toast.text}
-            </p>
-          )}
-        </div>
       </div>
+      {toastEl}
       {done ? (
         <p className="animate-pulse text-sm text-muted">revealing your team…</p>
       ) : (
