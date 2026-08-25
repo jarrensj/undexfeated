@@ -17,6 +17,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL;
+  // X handle link in the footer — hidden entirely when the env is unset.
+  const xAccount = process.env.NEXT_PUBLIC_X_ACCOUNT?.replace(/^@/, "");
   return (
     <html lang="en" className={`${mono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
@@ -33,15 +35,30 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           infringement. Team ratings are fan-made opinions for entertainment
           purposes only. Any material will be removed promptly at a rights
           holder&apos;s request.
-          {contactEmail && (
+          {(contactEmail || xAccount) && (
             <span className="mt-2 block">
-              contact:{" "}
-              <a
-                href={`mailto:${contactEmail}`}
-                className="underline [text-underline-offset:3px] transition-colors duration-150 hover:text-accent"
-              >
-                {contactEmail}
-              </a>
+              {contactEmail && (
+                <>
+                  contact:{" "}
+                  <a
+                    href={`mailto:${contactEmail}`}
+                    className="underline [text-underline-offset:3px] transition-colors duration-150 hover:text-accent"
+                  >
+                    {contactEmail}
+                  </a>
+                </>
+              )}
+              {contactEmail && xAccount && " · "}
+              {xAccount && (
+                <a
+                  href={`https://x.com/${xAccount}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline [text-underline-offset:3px] transition-colors duration-150 hover:text-accent"
+                >
+                  @{xAccount}
+                </a>
+              )}
             </span>
           )}
         </footer>
