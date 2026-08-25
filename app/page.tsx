@@ -8,13 +8,16 @@ export default async function Home() {
   const date = todayPacific();
   const deal = dailyDeal(date);
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-10">
-      <div className="flex flex-col items-center gap-1">
-        <h1>undexfeated</h1>
-        <p className="text-sm text-zinc-500 tabular-nums">daily · {date}</p>
+    <main className="flex flex-1 flex-col items-center justify-center gap-12 px-5 py-12">
+      <div className="flex flex-col items-center gap-1.5">
+        <h1 className="text-xl font-bold tracking-[0.06em]">undexfeated</h1>
+        <p className="text-[13px] text-muted tabular-nums">daily · {date}</p>
       </div>
       <Game key={date} deal={deal} restartable={false} dailyDate={date} />
-      <Link href="/practice" className="text-xs text-zinc-500 underline">
+      <Link
+        href="/practice"
+        className="text-xs text-muted underline [text-underline-offset:3px] transition-colors duration-150 hover:text-accent"
+      >
         practice mode
       </Link>
     </main>

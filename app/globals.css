@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0d0d0a; /* warm near-black */
+  --foreground: #ece9dd; /* warm off-white */
+  --muted: #8a8778; /* secondary text */
+  --faint: #5d5b4d; /* tertiary hints */
+  --ghost: #4a4940; /* footer text */
+  --surface: #14140f; /* button fill */
+  --surface-2: #12120d; /* reveal card fill */
+  --border: #2a2a20; /* button border */
+  --border-2: #23231a; /* card border / bar track */
+  --hash: #3d3c30; /* dimmed "#" glyph */
+  --accent: #eab308; /* yellow — score, primary buttons, current slot, hovers */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-ghost: var(--ghost);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border-1: var(--border);
+  --color-border-2: var(--border-2);
+  --color-hash: var(--hash);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-jetbrains-mono);
+  --font-mono: var(--font-jetbrains-mono);
+  --animate-fade-up: fade-up 0.35s ease both;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-jetbrains-mono), monospace;
 }
