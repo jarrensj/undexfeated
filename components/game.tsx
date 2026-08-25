@@ -4,13 +4,17 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { revealTeam } from "@/app/actions";
 import type { PokemonInfo } from "@/lib/db";
-import { type Decision, TEAM_SIZE, wrapDex } from "@/lib/dex";
+import { TEAM_SIZE, wrapDex } from "@/lib/dex";
 
-const DECISIONS: Decision[] = [-10, 0, 10];
-
-function decisionLabel(decision: Decision): string {
+// Each slot's decision is the applied shift: 0 = keep, otherwise ±(two-d6 roll).
+function decisionLabel(decision: number): string {
   if (decision === 0) return "keep";
   return decision > 0 ? `+${decision}` : `−${-decision}`;
+}
+
+function rollDice(): [number, number] {
+  const die = () => Math.floor(Math.random() * 6) + 1;
+  return [die(), die()];
 }
 
 function statTotal(info: PokemonInfo): number {
@@ -44,7 +48,13 @@ export default function Game({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [started, setStarted] = useState(false);
-  const [decisions, setDecisions] = useState<Decision[]>([]);
+  const [decisions, setDecisions] = useState<number[]>([]);
+  // The in-flight dice roll: shown faces cycle while rolling, then settle.
+  const [roll, setRoll] = useState<{
+    sign: -1 | 1;
+    shown: [number, number];
+    settled: boolean;
+  } | null>(null);
   const [team, setTeam] = useState<(PokemonInfo | null)[] | null>(null);
   // Brief pause after the sixth pick so the completed draft registers
   // before the results take over.
@@ -54,13 +64,13 @@ export default function Game({
   const round = decisions.length;
   const done = round === TEAM_SIZE;
 
-  // −10 and +10 are each usable once per draft; keep is always available.
-  const shiftUsed = (decision: Decision) =>
-    decision !== 0 && decisions.includes(decision);
+  // The minus roll and the plus roll are each usable once per draft;
+  // keep is always available.
+  const minusUsed = decisions.some((d) => d < 0);
+  const plusUsed = decisions.some((d) => d > 0);
 
-  const choose = (decision: Decision) => {
-    if (done || shiftUsed(decision)) return;
-    const next = [...decisions, decision];
+  const commit = (delta: number) => {
+    const next = [...decisions, delta];
     setDecisions(next);
     if (next.length === TEAM_SIZE) {
       const finals = deal.map((n, i) => wrapDex(n, next[i]));
@@ -71,6 +81,31 @@ export default function Game({
     }
   };
 
+  // You spend the roll before seeing it: dice animate, settle, then wait
+  // for the player to advance.
+  const spendRoll = (sign: -1 | 1) => {
+    if (done || roll) return;
+    if (sign < 0 && minusUsed) return;
+    if (sign > 0 && plusUsed) return;
+    const final = rollDice();
+    setRoll({ sign, shown: rollDice(), settled: false });
+    const spin = setInterval(() => {
+      setRoll((r) => (r && !r.settled ? { ...r, shown: rollDice() } : r));
+    }, 80);
+    setTimeout(() => {
+      clearInterval(spin);
+      setRoll({ sign, shown: final, settled: true });
+    }, 800);
+  };
+
+  // Apply the settled roll and move on — only on the player's click.
+  const advance = () => {
+    if (!roll?.settled) return;
+    const delta = roll.sign * (roll.shown[0] + roll.shown[1]);
+    setRoll(null);
+    commit(delta);
+  };
+
   // A fresh deal remounts this component (keyed by deal), resetting decisions.
   const restart = () => startTransition(() => router.refresh());
 
@@ -78,6 +113,7 @@ export default function Game({
   const playAgain = () => {
     setDecisions([]);
     setTeam(null);
+    setRoll(null);
     setShowResults(false);
     setCopied(false);
   };
@@ -87,7 +123,7 @@ export default function Game({
       <div className="flex animate-fade-up flex-col items-center gap-7">
         <p className="max-w-[360px] text-center text-sm leading-[1.7] text-muted">
           draft a team of six by dex number alone — keep what you&apos;re dealt
-          or shift it ±10. you only meet your team at the end.
+          or gamble on a dice roll. you only meet your team at the end.
         </p>
         <button
           onClick={() => setStarted(true)}
@@ -263,29 +299,68 @@ export default function Game({
             <span className="text-hash">#</span>
             {deal[round]}
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {DECISIONS.map((decision) => (
+          <p className="h-7 text-lg tabular-nums">
+            {roll && (
+              <>
+                🎲 {roll.shown[0]} + 🎲 {roll.shown[1]}
+                {roll.settled && (
+                  <span className="font-semibold text-accent">
+                    {" = "}
+                    {roll.sign > 0 ? "+" : "−"}
+                    {roll.shown[0] + roll.shown[1]}
+                    {" → #"}
+                    {wrapDex(
+                      deal[round],
+                      roll.sign * (roll.shown[0] + roll.shown[1]),
+                    )}
+                  </span>
+                )}
+              </>
+            )}
+          </p>
+          {roll?.settled ? (
+            <button
+              onClick={advance}
+              className="min-w-24 animate-fade-up rounded-md bg-accent px-9 py-3 text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
+            >
+              next
+            </button>
+          ) : (
+            <div className="flex flex-wrap justify-center gap-3">
               <button
-                key={decision}
-                onClick={() => choose(decision)}
-                disabled={shiftUsed(decision)}
-                className="flex min-w-24 flex-col items-center gap-0.5 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
+                onClick={() => spendRoll(-1)}
+                disabled={!!roll || minusUsed}
+                className="min-w-24 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
               >
                 <span
-                  className={`text-sm font-semibold ${
-                    shiftUsed(decision) ? "line-through" : ""
-                  }`}
+                  className={`text-sm font-semibold ${minusUsed ? "line-through" : ""}`}
                 >
-                  {decisionLabel(decision)}
-                </span>
-                <span className="text-[11px] text-muted tabular-nums">
-                  → #{wrapDex(deal[round], decision)}
+                  − roll
                 </span>
               </button>
-            ))}
-          </div>
+              <button
+                onClick={() => commit(0)}
+                disabled={!!roll}
+                className="min-w-24 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
+              >
+                <span className="text-sm font-semibold">keep</span>
+              </button>
+              <button
+                onClick={() => spendRoll(1)}
+                disabled={!!roll || plusUsed}
+                className="min-w-24 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
+              >
+                <span
+                  className={`text-sm font-semibold ${plusUsed ? "line-through" : ""}`}
+                >
+                  + roll
+                </span>
+              </button>
+            </div>
+          )}
           <p className="text-xs text-faint">
-            −10 and +10 can each be used once per draft
+            dice roll after you commit — the − roll and + roll can each be used
+            once per draft
           </p>
         </>
       )}
