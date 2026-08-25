@@ -12,8 +12,7 @@ const MODES = [
     key: "practice",
     href: "/practice",
     label: "practice mode",
-    tooltip:
-      "a fresh random deal every time — replay as much as you like, nothing counts",
+    tooltip: "a fresh random deal every time",
   },
 ] as const;
 
