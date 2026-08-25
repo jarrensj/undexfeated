@@ -205,9 +205,16 @@ export default function Game({
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <p className="text-sm text-zinc-500">
-        round {round + 1} of {TEAM_SIZE}
-      </p>
+      <div className="flex flex-col items-center gap-1">
+        <p className="text-sm text-zinc-500">
+          round {round + 1} of {TEAM_SIZE}
+        </p>
+        {round > 0 && (
+          <p className="text-xs text-zinc-500 tabular-nums">
+            so far: {decisions.map((d, i) => `#${wrapDex(deal[i], d)}`).join(" · ")}
+          </p>
+        )}
+      </div>
       <p className="text-6xl font-semibold tabular-nums">#{deal[round]}</p>
       <div className="flex gap-3">
         {DECISIONS.map((decision) => (
