@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// SIL Open Font License 1.1 — free for commercial use, self-hosted at build.
+const mono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -20,13 +17,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
+    <html lang="en" className={`${mono.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">
         {children}
-        <footer className="p-4 text-center text-xs text-zinc-500">
+        <footer className="mx-auto max-w-[720px] px-6 pt-5 pb-7 text-center text-[11px] leading-[1.6] text-ghost">
           undexfeated is a free, unofficial, fan-made project. It is not
           affiliated with, endorsed, or sponsored by Nintendo, Creatures Inc.,
           GAME FREAK inc., or The Pokémon Company. All Pokémon-related content

@@ -29,6 +29,9 @@ function isMobileDevice(): boolean {
   );
 }
 
+// Highest possible base stat total — scales the reveal stat bars.
+const MAX_MEMBER_TOTAL = 720;
+
 export default function Game({
   deal,
   restartable = true,
@@ -76,16 +79,16 @@ export default function Game({
 
   if (!started) {
     return (
-      <div className="flex flex-col items-center gap-6">
-        <p className="max-w-xs text-center text-sm text-zinc-500">
+      <div className="flex animate-fade-up flex-col items-center gap-7">
+        <p className="max-w-[360px] text-center text-sm leading-[1.7] text-muted">
           draft a team of six by dex number alone — keep what you&apos;re dealt
           or shift it ±10. you only meet your team at the end.
         </p>
         <button
           onClick={() => setStarted(true)}
-          className="rounded-full bg-foreground px-6 py-2 text-sm text-background hover:opacity-80"
+          className="rounded-md bg-accent px-9 py-[13px] text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
         >
-          start
+          start draft
         </button>
       </div>
     );
@@ -118,117 +121,163 @@ export default function Game({
     };
 
     return (
-      <div className="flex flex-col items-center gap-6">
-        <h2 className="text-lg font-medium">your team</h2>
-        <ol className="flex flex-col gap-3 tabular-nums">
+      <div className="flex w-full max-w-[600px] animate-fade-up flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-0.5">
+          <p className="text-xs uppercase tracking-[0.12em] text-muted">
+            team stat total
+          </p>
+          <p className="text-[52px] font-bold leading-none text-accent tabular-nums">
+            {team ? teamTotal : "…"}
+          </p>
+        </div>
+        <ol className="flex w-full flex-col gap-2.5">
           {deal.map((n, i) => {
             const info = team?.[i];
             return (
-              <li key={i} className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-3">
-                  <span className="w-16 text-right text-zinc-500">#{n}</span>
-                  <span className="w-12 text-center text-zinc-500">
-                    {decisionLabel(decisions[i])}
-                  </span>
-                  <span className="w-16 font-semibold">
+              <li
+                key={i}
+                className="flex animate-fade-up flex-col gap-2 rounded-lg border border-border-2 bg-surface-2 px-4 py-3.5"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className="flex flex-wrap items-baseline gap-3">
+                  <span className="text-[17px] font-bold tabular-nums">
                     #{wrapDex(n, decisions[i])}
                   </span>
-                  <span className="w-32 font-semibold">
+                  <span className="flex-1 text-[15px] font-semibold">
                     {team ? (info?.name ?? "?") : "…"}
                   </span>
-                  <span className="w-28 text-sm text-zinc-500">
-                    {info && (info.type2 ? `${info.type1} · ${info.type2}` : info.type1)}
+                  <span className="text-xs text-muted">
+                    {info &&
+                      (info.type2
+                        ? `${info.type1} · ${info.type2}`
+                        : info.type1)}
                   </span>
                 </div>
                 {info && (
-                  <p className="pl-[13.25rem] text-xs text-zinc-500">
-                    hp {info.hp} · atk {info.attack} · def {info.defense} · spa{" "}
-                    {info.sp_atk} · spd {info.sp_def} · spe {info.speed} · total{" "}
-                    {statTotal(info)}
-                  </p>
+                  <div className="flex flex-col gap-1.5">
+                    <p className="text-[11px] text-faint tabular-nums">
+                      dealt #{n} ·{" "}
+                      {decisions[i] === 0
+                        ? "kept"
+                        : `shifted ${decisionLabel(decisions[i])}`}
+                    </p>
+                    <p className="text-[11px] text-muted tabular-nums">
+                      hp {info.hp} · atk {info.attack} · def {info.defense} ·
+                      spa {info.sp_atk} · spd {info.sp_def} · spe {info.speed}
+                    </p>
+                    <div className="h-[3px] w-full rounded-sm bg-border-2">
+                      <div
+                        className="h-full rounded-sm bg-muted"
+                        style={{
+                          width: `${Math.min(100, (statTotal(info) / MAX_MEMBER_TOTAL) * 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
                 )}
               </li>
             );
           })}
         </ol>
         {team && (
-          <div className="flex flex-col items-center gap-1 tabular-nums">
-            <p className="text-xs text-zinc-500">team totals</p>
-            <p className="text-sm">
-              hp {sumStat("hp")} · atk {sumStat("attack")} · def{" "}
-              {sumStat("defense")} · spa {sumStat("sp_atk")} · spd{" "}
-              {sumStat("sp_def")} · spe {sumStat("speed")}
-            </p>
-            <p className="text-sm">
-              team stat total <span className="font-semibold">{teamTotal}</span>
-            </p>
-          </div>
+          <p className="text-xs text-muted tabular-nums">
+            hp {sumStat("hp")} · atk {sumStat("attack")} · def{" "}
+            {sumStat("defense")} · spa {sumStat("sp_atk")} · spd{" "}
+            {sumStat("sp_def")} · spe {sumStat("speed")}
+          </p>
         )}
         {dailyDate && team && (
-          <div className="flex gap-3">
+          <div className="flex flex-wrap justify-center gap-3">
             <button
               onClick={shareDaily}
-              className="rounded-full bg-foreground px-5 py-2 text-sm text-background hover:opacity-80"
+              className="rounded-md bg-accent px-9 py-[13px] text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
             >
-              {copied ? "copied!" : "share"}
+              {copied ? "copied!" : "share result"}
             </button>
             <button
               onClick={playAgain}
-              className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              className="rounded-md border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent"
             >
               play again
             </button>
           </div>
         )}
         {restartable ? (
-          <div className="flex gap-3">
+          <div className="flex flex-wrap justify-center gap-3">
             <button
               onClick={playAgain}
-              className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              className="rounded-md border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent"
             >
               play again
             </button>
             <button
               onClick={restart}
               disabled={pending}
-              className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              className="rounded-md border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent disabled:opacity-50"
             >
               new draft
             </button>
           </div>
         ) : (
-          <p className="text-xs text-zinc-500">new daily at midnight pst</p>
+          <p className="text-xs text-faint">new daily at midnight pst</p>
         )}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <div className="flex flex-col items-center gap-1">
-        <p className="text-sm text-zinc-500">
+    <div className="flex animate-fade-up flex-col items-center gap-8">
+      <div className="flex flex-col items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          {Array.from({ length: TEAM_SIZE }, (_, i) => (
+            <span
+              key={i}
+              className={`h-2.5 w-2.5 rounded-sm ${
+                i < round
+                  ? "bg-muted"
+                  : i === round
+                    ? "bg-accent"
+                    : "border border-border-1"
+              }`}
+            />
+          ))}
+        </div>
+        <p className="text-xs text-muted">
           round {round + 1} of {TEAM_SIZE}
         </p>
         {round > 0 && (
-          <p className="text-xs text-zinc-500 tabular-nums">
-            so far: {decisions.map((d, i) => `#${wrapDex(deal[i], d)}`).join(" · ")}
+          <p className="text-[11px] text-faint tabular-nums">
+            so far:{" "}
+            {decisions.map((d, i) => `#${wrapDex(deal[i], d)}`).join(" · ")}
           </p>
         )}
       </div>
-      <p className="text-6xl font-semibold tabular-nums">#{deal[round]}</p>
-      <div className="flex gap-3">
+      <p className="text-[clamp(72px,16vw,120px)] font-bold leading-none tracking-[-0.02em] tabular-nums">
+        <span className="text-hash">#</span>
+        {deal[round]}
+      </p>
+      <div className="flex flex-wrap justify-center gap-3">
         {DECISIONS.map((decision) => (
           <button
             key={decision}
             onClick={() => choose(decision)}
             disabled={shiftUsed(decision)}
-            className="rounded-full border border-zinc-300 px-5 py-2 text-sm hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent dark:border-zinc-700 dark:hover:bg-zinc-900 dark:disabled:hover:bg-transparent"
+            className="flex min-w-24 flex-col items-center gap-0.5 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
           >
-            {decisionLabel(decision)}
+            <span
+              className={`text-sm font-semibold ${
+                shiftUsed(decision) ? "line-through" : ""
+              }`}
+            >
+              {decisionLabel(decision)}
+            </span>
+            <span className="text-[11px] text-muted tabular-nums">
+              → #{wrapDex(deal[round], decision)}
+            </span>
           </button>
         ))}
       </div>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-faint">
         −10 and +10 can each be used once per draft
       </p>
     </div>
