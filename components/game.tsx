@@ -162,32 +162,32 @@ export default function Game({
     };
 
     return (
-      <div className="flex w-full max-w-[600px] animate-fade-up flex-col items-center gap-8">
+      <div className="flex w-full max-w-[600px] animate-fade-up flex-col items-center gap-5">
         <div className="flex flex-col items-center gap-0.5">
           <p className="text-xs uppercase tracking-[0.12em] text-muted">
             team stat total
           </p>
-          <p className="text-[52px] font-bold leading-none text-accent tabular-nums">
+          <p className="text-[40px] font-bold leading-none text-accent tabular-nums">
             {team ? teamTotal : "…"}
           </p>
         </div>
-        <ol className="flex w-full flex-col gap-2.5">
+        <ol className="flex w-full flex-col gap-1.5">
           {deal.map((n, i) => {
             const info = team?.[i];
             return (
               <li
                 key={i}
-                className="flex animate-fade-up flex-col gap-2 rounded-lg border border-border-2 bg-surface-2 px-4 py-3.5"
+                className="flex animate-fade-up flex-col gap-1 rounded-lg border border-border-2 bg-surface-2 px-3.5 py-2"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
-                <div className="flex flex-wrap items-baseline gap-3">
-                  <span className="text-[17px] font-bold tabular-nums">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+                  <span className="text-sm font-bold tabular-nums">
                     #{wrapDex(n, decisions[i])}
                   </span>
-                  <span className="flex-1 text-[15px] font-semibold">
+                  <span className="flex-1 text-sm font-semibold">
                     {team ? (info?.name ?? "?") : "…"}
                   </span>
-                  <span className="text-xs text-muted">
+                  <span className="text-[11px] text-muted">
                     {info &&
                       (info.type2
                         ? `${info.type1} · ${info.type2}`
@@ -195,18 +195,16 @@ export default function Game({
                   </span>
                 </div>
                 {info && (
-                  <div className="flex flex-col gap-1.5">
-                    <p className="text-[11px] text-faint tabular-nums">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-[10px] text-faint tabular-nums">
                       dealt #{n} ·{" "}
                       {decisions[i] === 0
                         ? "kept"
-                        : `shifted ${decisionLabel(decisions[i])}`}
-                    </p>
-                    <p className="text-[11px] text-muted tabular-nums">
-                      hp {info.hp} · atk {info.attack} · def {info.defense} ·
+                        : `shifted ${decisionLabel(decisions[i])}`}{" "}
+                      · hp {info.hp} · atk {info.attack} · def {info.defense} ·
                       spa {info.sp_atk} · spd {info.sp_def} · spe {info.speed}
                     </p>
-                    <div className="h-[3px] w-full rounded-sm bg-border-2">
+                    <div className="h-[2px] w-full rounded-sm bg-border-2">
                       <div
                         className="h-full rounded-sm bg-muted"
                         style={{
@@ -221,7 +219,7 @@ export default function Game({
           })}
         </ol>
         {team && (
-          <p className="text-xs text-muted tabular-nums">
+          <p className="text-[11px] text-muted tabular-nums">
             hp {sumStat("hp")} · atk {sumStat("attack")} · def{" "}
             {sumStat("defense")} · spa {sumStat("sp_atk")} · spd{" "}
             {sumStat("sp_def")} · spe {sumStat("speed")}
@@ -231,13 +229,13 @@ export default function Game({
           <div className="flex flex-wrap justify-center gap-3">
             <button
               onClick={shareDaily}
-              className="rounded-md bg-accent px-9 py-[13px] text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
+              className="rounded-md bg-accent px-7 py-2.5 text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
             >
               {copied ? "copied!" : "share result"}
             </button>
             <button
               onClick={playAgain}
-              className="rounded-md border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent"
+              className="rounded-md border border-border-1 bg-surface px-5 py-2.5 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent"
             >
               play again
             </button>
@@ -247,14 +245,14 @@ export default function Game({
           <div className="flex flex-wrap justify-center gap-3">
             <button
               onClick={playAgain}
-              className="rounded-md border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent"
+              className="rounded-md border border-border-1 bg-surface px-5 py-2.5 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent"
             >
               play again
             </button>
             <button
               onClick={restart}
               disabled={pending}
-              className="rounded-md border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent disabled:opacity-50"
+              className="rounded-md border border-border-1 bg-surface px-5 py-2.5 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent disabled:opacity-50"
             >
               new draft
             </button>
