@@ -49,6 +49,8 @@ export default function Game({
   // Brief pause after the sixth pick so the completed draft registers
   // before the results take over.
   const [showResults, setShowResults] = useState(false);
+  // Quick feedback after each decision; keyed so back-to-back picks re-animate.
+  const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
   const [copied, setCopied] = useState(false);
 
   const round = decisions.length;
@@ -60,6 +62,18 @@ export default function Game({
 
   const choose = (decision: Decision) => {
     if (done || shiftUsed(decision)) return;
+    const dealt = deal[round];
+    const landed = wrapDex(dealt, decision);
+    // The round number is unique per pick, so consecutive toasts re-key.
+    const id = round;
+    setToast({
+      id,
+      text:
+        decision === 0
+          ? `kept #${landed}`
+          : `#${dealt} ${decisionLabel(decision)} → #${landed}`,
+    });
+    setTimeout(() => setToast((t) => (t?.id === id ? null : t)), 1600);
     const next = [...decisions, decision];
     setDecisions(next);
     if (next.length === TEAM_SIZE) {
@@ -79,8 +93,27 @@ export default function Game({
     setDecisions([]);
     setTeam(null);
     setShowResults(false);
+    setToast(null);
     setCopied(false);
   };
+
+  // Overlay anchored just above the wordmark — outside the layout flow,
+  // so it never pushes content around.
+  const toastEl = (
+    <div
+      aria-live="polite"
+      className="pointer-events-none absolute inset-x-0 bottom-full z-50 mb-[88px] flex justify-center"
+    >
+      {toast && (
+        <p
+          key={toast.id}
+          className="rounded-md bg-accent px-4 py-1.5 text-sm font-bold whitespace-nowrap tabular-nums text-background [animation:toast-in_0.2s_ease-out]"
+        >
+          {toast.text}
+        </p>
+      )}
+    </div>
+  );
 
   if (!started) {
     return (
@@ -126,7 +159,7 @@ export default function Game({
     };
 
     return (
-      <div className="flex w-full max-w-[600px] animate-fade-up flex-col items-center gap-8">
+      <div className="relative flex w-full max-w-[600px] animate-fade-up flex-col items-center gap-8">
         <div className="flex flex-col items-center gap-0.5">
           <p className="text-xs uppercase tracking-[0.12em] text-muted">
             team stat total
@@ -226,12 +259,13 @@ export default function Game({
         ) : (
           <p className="text-xs text-faint">new daily at midnight pst</p>
         )}
+        {toastEl}
       </div>
     );
   }
 
   return (
-    <div className="flex animate-fade-up flex-col items-center gap-8">
+    <div className="relative flex animate-fade-up flex-col items-center gap-8">
       <div className="flex flex-col items-center gap-2.5">
         <div className="flex items-center gap-2">
           {Array.from({ length: TEAM_SIZE }, (_, i) => (
@@ -257,6 +291,7 @@ export default function Game({
           </p>
         )}
       </div>
+      {toastEl}
       {done ? (
         <p className="animate-pulse text-sm text-muted">revealing your team…</p>
       ) : (

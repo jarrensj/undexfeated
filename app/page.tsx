@@ -8,7 +8,7 @@ export default async function Home() {
   const date = todayPacific();
   const deal = dailyDeal(date);
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-12 px-5 py-12">
+    <main className="flex flex-1 flex-col items-center justify-center gap-8 px-5 py-12">
       <div className="flex flex-col items-center gap-1.5">
         <h1 className="text-xl font-bold tracking-[0.06em]">undexfeated</h1>
         <p className="text-[13px] text-muted tabular-nums">daily · {date}</p>
