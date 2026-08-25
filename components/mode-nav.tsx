@@ -1,13 +1,21 @@
 import Link from "next/link";
 
 const MODES = [
-  { key: "daily", href: "/", label: "daily mode" },
-  { key: "practice", href: "/practice", label: "practice mode" },
+  {
+    key: "daily",
+    href: "/",
+    label: "daily mode",
+    tooltip:
+      "everyone's daily is dealt from the same seed — compare your score with anyone playing today",
+  },
+  {
+    key: "practice",
+    href: "/practice",
+    label: "practice mode",
+    tooltip:
+      "a fresh random deal every time — replay as much as you like, nothing counts",
+  },
 ] as const;
-
-// Hover explainer for the daily — why today's score is comparable.
-const DAILY_TOOLTIP =
-  "everyone's daily is dealt from the same seed — compare your score with anyone playing today";
 
 export default function ModeNav({
   active,
@@ -30,14 +38,12 @@ export default function ModeNav({
               {mode.label}
             </Link>
           )}
-          {mode.key === "daily" && (
-            <span
-              role="tooltip"
-              className="pointer-events-none absolute top-full left-0 mt-1.5 hidden w-60 rounded-md border border-border-2 bg-surface-2 px-3 py-2 text-[11px] leading-relaxed text-muted group-hover:block"
-            >
-              {DAILY_TOOLTIP}
-            </span>
-          )}
+          <span
+            role="tooltip"
+            className="pointer-events-none absolute top-full left-0 mt-1.5 hidden w-60 rounded-md border border-border-2 bg-surface-2 px-3 py-2 text-[11px] leading-relaxed text-muted group-hover:block"
+          >
+            {mode.tooltip}
+          </span>
         </span>
       ))}
     </nav>
