@@ -86,9 +86,9 @@ export default function Game({
         </p>
         <button
           onClick={() => setStarted(true)}
-          className="rounded-md bg-accent px-9 py-[13px] text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
+          className="rounded-none bg-accent px-9 py-[13px] text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
         >
-          start draft
+          [ start draft ]
         </button>
       </div>
     );
@@ -136,7 +136,7 @@ export default function Game({
             return (
               <li
                 key={i}
-                className="flex animate-fade-up flex-col gap-2 rounded-lg border border-border-2 bg-surface-2 px-4 py-3.5"
+                className="flex animate-fade-up flex-col gap-2 rounded-none border border-border-2 bg-surface-2 px-4 py-3.5"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <div className="flex flex-wrap items-baseline gap-3">
@@ -165,9 +165,9 @@ export default function Game({
                       hp {info.hp} · atk {info.attack} · def {info.defense} ·
                       spa {info.sp_atk} · spd {info.sp_def} · spe {info.speed}
                     </p>
-                    <div className="h-[3px] w-full rounded-sm bg-border-2">
+                    <div className="h-[3px] w-full rounded-none bg-border-2">
                       <div
-                        className="h-full rounded-sm bg-muted"
+                        className="h-full rounded-none bg-muted"
                         style={{
                           width: `${Math.min(100, (statTotal(info) / MAX_MEMBER_TOTAL) * 100)}%`,
                         }}
@@ -190,15 +190,15 @@ export default function Game({
           <div className="flex flex-wrap justify-center gap-3">
             <button
               onClick={shareDaily}
-              className="rounded-md bg-accent px-9 py-[13px] text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
+              className="rounded-none bg-accent px-9 py-[13px] text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
             >
-              {copied ? "copied!" : "share result"}
+              {copied ? "[ copied! ]" : "[ share result ]"}
             </button>
             <button
               onClick={playAgain}
-              className="rounded-md border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent"
+              className="rounded-none border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent"
             >
-              play again
+              [ play again ]
             </button>
           </div>
         )}
@@ -206,16 +206,16 @@ export default function Game({
           <div className="flex flex-wrap justify-center gap-3">
             <button
               onClick={playAgain}
-              className="rounded-md border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent"
+              className="rounded-none border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent"
             >
-              play again
+              [ play again ]
             </button>
             <button
               onClick={restart}
               disabled={pending}
-              className="rounded-md border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent disabled:opacity-50"
+              className="rounded-none border border-border-1 bg-surface px-5 py-3 text-sm font-semibold transition-colors duration-150 hover:border-accent hover:text-accent disabled:opacity-50"
             >
-              new draft
+              [ new draft ]
             </button>
           </div>
         ) : (
@@ -232,7 +232,7 @@ export default function Game({
           {Array.from({ length: TEAM_SIZE }, (_, i) => (
             <span
               key={i}
-              className={`h-2.5 w-2.5 rounded-sm ${
+              className={`h-2.5 w-2.5 rounded-none ${
                 i < round
                   ? "bg-muted"
                   : i === round
@@ -262,14 +262,14 @@ export default function Game({
             key={decision}
             onClick={() => choose(decision)}
             disabled={shiftUsed(decision)}
-            className="flex min-w-24 flex-col items-center gap-0.5 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
+            className="flex min-w-24 flex-col items-center gap-0.5 rounded-none border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
           >
             <span
               className={`text-sm font-semibold ${
                 shiftUsed(decision) ? "line-through" : ""
               }`}
             >
-              {decisionLabel(decision)}
+              [ {decisionLabel(decision)} ]
             </span>
             <span className="text-[11px] text-muted tabular-nums">
               → #{wrapDex(deal[round], decision)}

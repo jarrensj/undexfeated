@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0d0d0a; /* warm near-black */
-  --foreground: #ece9dd; /* warm off-white */
-  --muted: #8a8778; /* secondary text */
-  --faint: #5d5b4d; /* tertiary hints */
-  --ghost: #4a4940; /* footer text */
-  --surface: #14140f; /* button fill */
-  --surface-2: #12120d; /* reveal card fill */
-  --border: #2a2a20; /* button border */
-  --border-2: #23231a; /* card border / bar track */
-  --hash: #3d3c30; /* dimmed "#" glyph */
-  --accent: #eab308; /* yellow — score, primary buttons, current slot, hovers */
+  --background: #0a0f0a; /* green-tinted black */
+  --foreground: #d7e0d0; /* pale phosphor white */
+  --muted: #7a8a74; /* secondary text */
+  --faint: #4f5c4a; /* tertiary hints */
+  --ghost: #3f4a3b; /* footer text */
+  --surface: #0e140e; /* button fill */
+  --surface-2: #0c120c; /* reveal card fill */
+  --border: #1f2b1e; /* button border */
+  --border-2: #1a241a; /* card border / bar track */
+  --hash: #33402f; /* dimmed "#" glyph */
+  --accent: #4ade80; /* phosphor green — score, primary buttons, current slot, hovers */
 }
 
 @theme inline {

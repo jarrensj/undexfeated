@@ -26,20 +26,22 @@ export default async function GatePage({
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-12 px-5 py-12">
-      <h1 className="text-xl font-bold tracking-[0.06em]">undexfeated</h1>
+      <h1 className="text-xl font-bold tracking-[0.06em]">
+          <span className="text-accent">&gt;</span> undexfeated
+        </h1>
       <form action={unlock} className="flex flex-col items-center gap-4">
         <input
           type="password"
           name="password"
           placeholder="password"
           autoFocus
-          className="rounded-md border border-border-1 bg-surface px-4 py-2 text-sm outline-none focus:border-accent"
+          className="rounded-none border border-border-1 bg-surface px-4 py-2 text-sm outline-none focus:border-accent"
         />
         <button
           type="submit"
-          className="rounded-md bg-accent px-9 py-3 text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
+          className="rounded-none bg-accent px-9 py-3 text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
         >
-          enter
+          [ enter ]
         </button>
         {wrong && <p className="text-xs text-faint">wrong password</p>}
       </form>
