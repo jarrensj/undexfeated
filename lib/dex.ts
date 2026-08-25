@@ -1,12 +1,12 @@
 export const MAX_DEX = 1025;
-export const SHIFT = 10;
 export const TEAM_SIZE = 6;
 
-// Dealt numbers stay this far apart (circularly) so no two slots can
-// land on the same dex number after shifting.
-export const MIN_GAP = 2 * SHIFT;
+// Shifts come from a two-d6 roll, so the largest possible shift is 12.
+export const MAX_SHIFT = 12;
 
-export type Decision = -10 | 0 | 10;
+// Dealt numbers stay this far apart (circularly) so no two slots can
+// land on the same dex number even after opposing max shifts.
+export const MIN_GAP = 2 * MAX_SHIFT;
 
 // Shifting wraps around the dex: #5 - 10 → #1020, #1020 + 10 → #5.
 export function wrapDex(n: number, delta: number): number {
