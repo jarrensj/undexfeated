@@ -247,7 +247,7 @@ export default function Game({
 
   return (
     <div className="flex animate-fade-up flex-col items-center gap-8">
-      <div className="flex flex-col items-center gap-2.5">
+      <div className="relative flex flex-col items-center gap-2.5">
         <div className="flex items-center gap-2">
           {Array.from({ length: TEAM_SIZE }, (_, i) => (
             <span
@@ -271,16 +271,19 @@ export default function Game({
             {decisions.map((d, i) => `#${wrapDex(deal[i], d)}`).join(" · ")}
           </p>
         )}
-      </div>
-      <div aria-live="polite" className="flex h-9 items-center">
-        {toast && (
-          <p
-            key={toast.id}
-            className="rounded-md bg-accent px-4 py-1.5 text-sm font-bold tabular-nums text-background [animation:toast-in_0.2s_ease-out]"
-          >
-            {toast.text}
-          </p>
-        )}
+        <div
+          aria-live="polite"
+          className="pointer-events-none absolute inset-x-0 top-full z-10 mt-2 flex justify-center"
+        >
+          {toast && (
+            <p
+              key={toast.id}
+              className="rounded-md bg-accent px-4 py-1.5 text-sm font-bold whitespace-nowrap tabular-nums text-background [animation:toast-in_0.2s_ease-out]"
+            >
+              {toast.text}
+            </p>
+          )}
+        </div>
       </div>
       {done ? (
         <p className="animate-pulse text-sm text-muted">revealing your team…</p>
