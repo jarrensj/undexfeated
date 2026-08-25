@@ -81,7 +81,8 @@ export default function Game({
     }
   };
 
-  // You spend the roll before seeing it: dice animate, settle, then apply.
+  // You spend the roll before seeing it: dice animate, settle, then wait
+  // for the player to advance.
   const spendRoll = (sign: -1 | 1) => {
     if (done || roll) return;
     if (sign < 0 && minusUsed) return;
@@ -94,11 +95,15 @@ export default function Game({
     setTimeout(() => {
       clearInterval(spin);
       setRoll({ sign, shown: final, settled: true });
-      setTimeout(() => {
-        setRoll(null);
-        commit(sign * (final[0] + final[1]));
-      }, 2600);
     }, 800);
+  };
+
+  // Apply the settled roll and move on — only on the player's click.
+  const advance = () => {
+    if (!roll?.settled) return;
+    const delta = roll.sign * (roll.shown[0] + roll.shown[1]);
+    setRoll(null);
+    commit(delta);
   };
 
   // A fresh deal remounts this component (keyed by deal), resetting decisions.
@@ -315,37 +320,46 @@ export default function Game({
               </>
             )}
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
+          {roll?.settled ? (
             <button
-              onClick={() => spendRoll(-1)}
-              disabled={!!roll || minusUsed}
-              className="min-w-24 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
+              onClick={advance}
+              className="min-w-24 animate-fade-up rounded-md bg-accent px-9 py-3 text-sm font-bold tracking-[0.04em] text-background transition-[filter] duration-150 hover:brightness-[1.12]"
             >
-              <span
-                className={`text-sm font-semibold ${minusUsed ? "line-through" : ""}`}
+              next
+            </button>
+          ) : (
+            <div className="flex flex-wrap justify-center gap-3">
+              <button
+                onClick={() => spendRoll(-1)}
+                disabled={!!roll || minusUsed}
+                className="min-w-24 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
               >
-                − roll
-              </span>
-            </button>
-            <button
-              onClick={() => commit(0)}
-              disabled={!!roll}
-              className="min-w-24 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
-            >
-              <span className="text-sm font-semibold">keep</span>
-            </button>
-            <button
-              onClick={() => spendRoll(1)}
-              disabled={!!roll || plusUsed}
-              className="min-w-24 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
-            >
-              <span
-                className={`text-sm font-semibold ${plusUsed ? "line-through" : ""}`}
+                <span
+                  className={`text-sm font-semibold ${minusUsed ? "line-through" : ""}`}
+                >
+                  − roll
+                </span>
+              </button>
+              <button
+                onClick={() => commit(0)}
+                disabled={!!roll}
+                className="min-w-24 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
               >
-                + roll
-              </span>
-            </button>
-          </div>
+                <span className="text-sm font-semibold">keep</span>
+              </button>
+              <button
+                onClick={() => spendRoll(1)}
+                disabled={!!roll || plusUsed}
+                className="min-w-24 rounded-md border border-border-1 bg-surface px-5 py-3 transition-colors duration-150 hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-border-1 disabled:hover:text-foreground"
+              >
+                <span
+                  className={`text-sm font-semibold ${plusUsed ? "line-through" : ""}`}
+                >
+                  + roll
+                </span>
+              </button>
+            </div>
+          )}
           <p className="text-xs text-faint">
             dice roll after you commit — the − roll and + roll can each be used
             once per draft
